@@ -20,14 +20,12 @@ jobs:
             python -m pip install --upgrade pip
             if [ -f requirements.txt ]; then pip install -r requirements.txt -t .; fi 
       - name: Zip bundle
-        run: |
-            cd function
-            zip -r ../${{ github.sha }}.zip .
+        run: zip -r ../python-libraries.zip .
       - name: Archive artifact
         uses: actions/upload-artifact@v2
         with:
           name: zipped-bundle
-          path: ${{ github.sha }}.zip
+          path: python-libraries.zip
           
   upload:
       runs-on: ubuntu-latest
@@ -44,7 +42,7 @@ jobs:
              aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
              aws-region: us-east-1
         -   name: Uplaod to S3
-            run:  aws s3 cp  ${{ github.sha }}.zip s3://hellogithubactions/${{ github.sha }}.zip
+            run:  aws s3 cp  python-libraries.zip s3://hellogithubactions/python-libraries.zip
           
          
         
