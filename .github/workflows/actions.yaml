@@ -40,8 +40,8 @@ jobs:
         -  name: Configure AWS Credentials
            uses: aws-actions/configure-aws-credentials@v1
            with:
-             aws-access-key-id: ${{ secrets.aws-access-key }}
-             aws-secret-access-key: ${{ secrets.aws-secret-key }}
+             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+             aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
              aws-region: us-east-1
         -   name: Uplaod to S3
             run:  aws s3 cp  ${{ github.sha }}.zip s3://hellogithubactions/${{ github.sha }}.zip
