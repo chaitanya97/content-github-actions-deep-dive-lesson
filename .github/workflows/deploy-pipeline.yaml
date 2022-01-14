@@ -61,3 +61,20 @@ jobs:
           draft: false
           prerelease: false
           owner: Chaitanya Surabhi
+      - name: download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: zipped-bundle
+      - name: upload artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.github.token }}
+        with: 
+          upload_url: ${{ steps.create-release.outputs.uplaod_url }}
+          asset_path: ./${{ github.sha }}.zip
+          asset_name: source-code_with_libraries
+          asset_content_type: application/zip
+          
+           
+       
+       
