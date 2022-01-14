@@ -1,4 +1,4 @@
-name: Upload AWS Function
+name: Deploy to Lambda Function
 on: push
 
 jobs:
@@ -45,6 +45,27 @@ jobs:
              aws-region: us-east-1
         -   name: Uplaod to S3
             run:  aws s3 cp  python-libraries.zip s3://hellogithubactions/python-libraries.zip
+            
+  deploy:
+    runs-on: ubuntu-latest
+    needs: upload
+    steps:
+        -  name: Configure AWS Credentials
+           uses: aws-actions/configure-aws-credentials@v1
+           with:
+             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+             aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+             aws-region: us-east-1
+        -  name: Update Function Code
+           run: |
+                aws lambda update-function-code
+                  --function-name hellogithubactionsfunctions
+                  --s3-bucket hellogithubactions
+                  --s3-key python-libraries.zip
+                  --publish
+             
+          
+    
           
          
         
