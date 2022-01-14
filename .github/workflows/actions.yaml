@@ -58,11 +58,7 @@ jobs:
              aws-region: us-east-1
         -  name: Update function Code
            run: |
-               aws lambda update-function-code \
-                  --function-name hellogithubactionsfunctions \
-                  --s3-bucket hellogithubactions \ 
-                  --s3-key python-libraries.zip \ 
-                  --publish
+               aws lambda update-function-code --function-name hellogithubactionsfunctions --s3-bucket hellogithubactions --s3-key python-libraries.zip --publish
              
           
     
