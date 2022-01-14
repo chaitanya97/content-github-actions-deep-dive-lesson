@@ -1,4 +1,4 @@
-name: Deploy Lambda Function
+name: Upload AWS Function
 on: push
 
 jobs:
@@ -6,7 +6,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    needs: lint
+
     steps:
       - name: Check out code
         uses: actions/checkout@v2
