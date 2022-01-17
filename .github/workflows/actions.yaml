@@ -8,7 +8,7 @@ on:
 
 jobs:
 
- lint:
+  lint:
     runs-on: ubuntu-latest
     steps: 
       - name: Check out code
@@ -28,10 +28,7 @@ jobs:
             # The exit zero flag will show errors as warnings and not fail the run
             flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
             
-
-
-
- build:
+  build:
     runs-on: ubuntu-latest
     needs: lint
     steps:
@@ -56,7 +53,7 @@ jobs:
           name: zipped-bundle
           path: python-libraries.zip
           
- upload:
+  upload:
       runs-on: ubuntu-latest
       needs: build
       steps: 
@@ -74,9 +71,28 @@ jobs:
             run:  aws s3 cp  python-libraries.zip s3://hellogithubactions/python-libraries.zip
             
             
- deploy:
-    runs-on: ubuntu-latest
+  
+  test:
+    runs-on:: ubutnu-latest
     needs: upload
+    steps:
+     -  name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+             aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+             aws-region: us-east-1
+     -  name: Create a test function
+        run: |
+              aws lambda create-function --function-name hellogithubactionslambdatestfunction --code S3Bucket=hellogithubactions,S3Key=python-libraries.zip --handler lambda_function.lambda_handler --runtime python3.8 
+     -  name: Wait 30 Seconds
+        run: sleep 30
+     -  name: Destroy test function
+        if:  ${{ always() }}
+        run: aws lambda delete-function --function-name hellogithubactionslambdatestfunction       
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
     steps:
         -  name: Configure AWS Credentials
            uses: aws-actions/configure-aws-credentials@v1
