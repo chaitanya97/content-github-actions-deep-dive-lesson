@@ -67,7 +67,7 @@ jobs:
              aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
              aws-region: us-east-1
         -   name: Uplaod to S3
-            run:  aws s3 cp  python-libraries.zip s3://hellogithubactions/python-libraries.zip
+            run:  aws s3 cp  python-libraries.zip s3://hellogithubactionss3/python-libraries.zip
             
             
   
@@ -83,7 +83,7 @@ jobs:
              aws-region: us-east-1
      -  name: Create a test function
         run: |
-              aws lambda create-function --function-name hellogithubactionslambdatestfunction --code S3Bucket=hellogithubactions,S3Key=python-libraries.zip --handler lambda_function.lambda_handler --runtime python3.8 --role arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/my-lambda-role
+              aws lambda create-function --function-name hellogithubactionslambdatestfunction --code S3Bucket=hellogithubactionss3,S3Key=python-libraries.zip --handler lambda_function.lambda_handler --runtime python3.8 --role arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/lambdarole
      -  name: Wait 30 Seconds
         run: sleep 30
      -  name: Destroy test function
@@ -101,7 +101,7 @@ jobs:
              aws-region: us-east-1
         -  name: Update function Code
            run: |
-               aws lambda update-function-code --function-name hellogithubactionslambda --s3-bucket hellogithubactions --s3-key python-libraries.zip --publish
+               aws lambda update-function-code --function-name hellogithubactionslambda --s3-bucket hellogithubactionss3 --s3-key python-libraries.zip --publish
              
           
     
