@@ -67,7 +67,7 @@ jobs:
              aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
              aws-region: us-east-1
         -   name: Uplaod to S3
-            run:  aws s3 cp  python-libraries.zip s3://cfst-3457-c25d1beabe2ffffe90a79115c-nonprodbucket-1oxwgehwnkjqp/python-libraries.zip
+            run:  aws s3 cp  python-libraries.zip s3://hellogithubactionsbucket/python-libraries.zip
             
             
   
@@ -86,7 +86,7 @@ jobs:
              aws-region: us-east-1
      -  name: Create a test function
         run: |
-              aws lambda create-function --function-name hellogithubactionslambdatestfunction-${{ matrix.input }} --code S3Bucket=cfst-3457-c25d1beabe2ffffe90a79115c-nonprodbucket-1oxwgehwnkjqp,S3Key=python-libraries.zip --handler lambda_function.lambda_handler --runtime python3.8 --role arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/my-lambdarole
+              aws lambda create-function --function-name hellogithubactionslambdatestfunction-${{ matrix.input }} --code S3Bucket=hellogithubactionsbucket,S3Key=python-libraries.zip --handler lambda_function.lambda_handler --runtime python3.8 --role arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/my-lambdarole
      
      -  name: Invoke Test Function
         run: | 
@@ -111,9 +111,19 @@ jobs:
              aws-region: us-east-1
         -  name: Update function Code
            run: |
-               aws lambda create-function --function-name hellogithubactionslambda --code S3Bucket=cfst-3457-c25d1beabe2ffffe90a79115c-nonprodbucket-1oxwgehwnkjqp,S3Key=python-libraries.zip --handler lambda_function.lambda_handler --runtime python3.8 --role arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/my-lambdarole --publish
+               aws lambda create-function --function-name hellogithubactionslambda --code S3Bucket=hellogithubactionsbucket,S3Key=python-libraries.zip --handler lambda_function.lambda_handler --runtime python3.8 --role arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/my-lambdarole --publish
 
-             
+  docs:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Deploy docs
+        uses: mhausenblas/mkdocs-deploy-gh-pages@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CONFIG_FILE: mkdocs.yaml        
           
     
           
