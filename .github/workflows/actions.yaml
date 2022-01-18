@@ -74,6 +74,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     needs: upload
+    strategy:
+      matrix: 
+       input: ["Hello","Hi"]
     steps:
      -  name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -83,12 +86,20 @@ jobs:
              aws-region: us-east-1
      -  name: Create a test function
         run: |
-              aws lambda create-function --function-name hellogithubactionslambdatestfunction --code S3Bucket=hellogithubactionss3,S3Key=python-libraries.zip --handler lambda_function.lambda_handler --runtime python3.8 --role arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/githubactionslambdarole
+              aws lambda create-function --function-name hellogithubactionslambdatestfunction-${{ matrix.input }} --code S3Bucket=hellogithubactionss3,S3Key=python-libraries.zip --handler lambda_function.lambda_handler --runtime python3.8 --role arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/githubactionslambdarole
+     
+     -  name: Invoke Test Function
+        run: | 
+             aws lambda invoke --function-name hellogithubactionslambdatestfunction-${{ matrix.input }} --payload $(echo "{\"input\":\"${{ matrix.input }}\"}" | base64 --output json out
+             if grep -q "Error" out; then
+                exit1
+             fi 
      -  name: Wait 30 Seconds
         run: sleep 30
+                
      -  name: Destroy test function
         if:  ${{ always() }}
-        run: aws lambda delete-function --function-name hellogithubactionslambdatestfunction       
+        run: aws lambda delete-function --function-name hellogithubactionslambdatestfunction-${{ matrix.input }}     
   deploy:
     runs-on: ubuntu-latest
     needs: test
